@@ -95,6 +95,6 @@ RUN echo "service rsyslog start" >> /srv/init_service.sh
 # Install valijson
 RUN apt-get -y install libcurlpp-dev
 RUN git clone https://github.com/tristanpenman/valijson.git
-RUN cd valijson && mkdir build && \
+RUN cd valijson && mkdir build && cd build && \
     cmake ../ -Dvalijson_INSTALL_HEADERS=TRUE -Dvalijson_BUILD_EXAMPLES=FALSE -Dvalijson_BUILD_TESTS=FALSE -Dvalijson_EXCLUDE_BOOST=FALSE && \
     make install
