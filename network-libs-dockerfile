@@ -91,3 +91,10 @@ RUN echo "mailhub=localhost" >> /etc/ssmtp/ssmtp.conf
 RUN echo "hostname=localhost" >> /etc/ssmtp/ssmtp.conf
 RUN echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
 RUN echo "service rsyslog start" >> /srv/init_service.sh
+
+# Install valijson
+RUN apt-get -y install libcurlpp-dev
+RUN git clone https://github.com/tristanpenman/valijson.git
+RUN cd valijson && mkdir build && \
+    cmake ../ -Dvalijson_INSTALL_HEADERS=TRUE -Dvalijson_BUILD_EXAMPLES=FALSE -Dvalijson_BUILD_TESTS=FALSE -Dvalijson_EXCLUDE_BOOST=FALSE && \
+    make install
