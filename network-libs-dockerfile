@@ -33,7 +33,8 @@ RUN apt-get install -y \
     vim \
     software-properties-common \
     git \
-    cmake
+    cmake \
+    curl
 
 WORKDIR /root
 
