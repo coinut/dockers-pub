@@ -3,6 +3,7 @@ MAINTAINER Xinxi Wang <xinxi@coinut.com>
 
 # Refresh Packages
 RUN chmod 777 /tmp
+RUN ln -fs /usr/share/zoneinfo/Asia/Singapore /etc/localtime
 RUN apt-get update
 RUN apt-get -y upgrade && \
     apt-get -y install apt-utils
@@ -34,7 +35,8 @@ RUN apt-get install -y \
     software-properties-common \
     git \
     cmake \
-    curl
+    curl \
+    libzstd-dev
 
 WORKDIR /root
 
@@ -54,36 +56,27 @@ RUN mkdir build && cd build/ && cmake ../ -DLWS_WITHOUT_EXTENSIONS=OFF && make &
 RUN rm -r /root/libwebsockets
 
 # Install protobuf
-RUN add-apt-repository ppa:maarten-fonville/protobuf
-RUN apt update
 RUN apt install -y libprotobuf-dev protobuf-compiler
 
 # Install JWT
 RUN apt install -y libjwt-dev
 
-# Install bson
-WORKDIR /root
-RUN git clone https://github.com/mongodb/libbson.git
-RUN cd libbson/ && git checkout tags/1.9.5 && ./autogen.sh && make && make install
-RUN ln -s /usr/local/lib/libbson-1.0.so /usr/local/lib/libbson.so
-RUN ln -s /usr/local/include/libbson-1.0/* /usr/local/include/
-RUN rm -r libbson
-
 # Install mongo-c driver
-RUN git clone https://github.com/mongodb/mongo-c-driver.git
-RUN cd mongo-c-driver && git checkout tags/1.12.0 && cmake . && make && make install
-RUN ln -s /usr/local/include/libmongoc-1.0/* /usr/local/include/
-RUN rm -r mongo-c-driver
+RUN apt install -y libmongoc-dev
+
+# Install bson
+RUN apt install -y libbson-dev
 
 # Install mongo-cxx driver
 RUN git clone https://github.com/mongodb/mongo-cxx-driver.git --branch releases/v3.3 --depth 1
 RUN cd mongo-cxx-driver/build &&  \
-    cmake -DLIBBSON_DIR=/usr/local/lib -DLIBMONGOC_DIR=/usr/local/lib -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
     make
 RUN cd mongo-cxx-driver/build && make install
 RUN ln -s /usr/local/include/bsoncxx/v_noabi/bsoncxx/* /usr/local/include/bsoncxx/
 RUN ln -s /usr/local/include/mongocxx/v_noabi/mongocxx/* /usr/local/include/mongocxx/
 RUN rm -r mongo-cxx-driver
+
 
 # Install ssmtp
 RUN apt-get -y install ssmtp
